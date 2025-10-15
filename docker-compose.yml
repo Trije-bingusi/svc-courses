@@ -30,6 +30,8 @@ services:
 
   api:
     build: .
+    # once the image has been pushed to ACR, you can use the option below
+    # image: rsobingusi.azurecr.io/svc-courses:dev
     restart: unless-stopped
     environment:
       PORT: ${PORT}
