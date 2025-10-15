@@ -1,0 +1,25 @@
+{
+  "name": "node-docker-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Trije-bingusi/svc-courses.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Trije-bingusi/svc-courses/issues"
+  },
+  "homepage": "https://github.com/Trije-bingusi/svc-courses#readme",
+  "dependencies": {
+    "express": "^5.1.0",
+    "pg": "^8.16.3"
+  }
+}
