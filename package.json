@@ -1,5 +1,5 @@
 {
-  "name": "node-docker-app",
+  "name": "svc-courses",
   "version": "1.0.0",
   "description": "",
   "main": "app.js",
