@@ -35,6 +35,11 @@ else
   echo "AKS '$AKS' already exists in RG '$RG' — skipping create"
 fi
 
+# Attach ACR so pulls work
+if [[ -n "${ACR:-}" ]]; then
+  az aks update -n "$AKS" -g "$RG" --attach-acr "$ACR"
+fi
+
 echo "Getting kubeconfig"
 az aks get-credentials -n "$AKS" -g "$RG" --overwrite-existing
 
