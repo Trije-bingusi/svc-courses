@@ -1,7 +1,9 @@
 import express from "express";
+import client from "prom-client";
+import pinoHttp from "pino-http";
+import YAML from "yamljs";
 import { Pool } from "pg";
 import { apiReference } from "@scalar/express-api-reference";
-import YAML from "yamljs";
 
 function required(name, fallback) {
     const v = process.env[name] ?? fallback;
@@ -26,17 +28,32 @@ app.use(express.json());
 
 // Scalar API reference setup
 const openapi = YAML.load("./openapi.yaml");
-app.get("/openai.json", (_req, res) => res.json(openapi));
+app.get("/openapi.json", (_req, res) => res.json(openapi));
 
 // Serve API reference at /docs
 app.use(
     "/docs",
     apiReference({
-        spec: { url: "/openai.json" },
+        spec: { url: "/openapi.json" },
         theme: "default",
         darkMode: true
     })
 );
+
+app.use(pinoHttp());
+
+client.collectDefaultMetrics();
+
+const courseCreatedCounter = new client.Counter({
+    name: "svc_courses_course_created_total",
+    help: "Total number of courses created",
+});
+
+// Metrics endpoint
+app.get("/metrics", async (_req, res) => {
+    res.set("Content-Type", client.register.contentType);
+    res.end(await client.register.metrics());
+});
 
 // Create tables if they don't already exist
 async function ensureSchema() {
@@ -91,6 +108,7 @@ app.post("/api/courses", async (req, res) => {
         `INSERT INTO courses (name) VALUES ($1) RETURNING id, name, created_at`,
         [name]
     );
+    courseCreatedCounter.inc();
     res.status(201).json(rows[0]); 
 });
 
