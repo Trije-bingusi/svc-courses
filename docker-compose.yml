@@ -33,6 +33,11 @@ services:
     # once the image has been pushed to ACR, you can use the option below
     # image: rsobingusi.azurecr.io/svc-courses:dev
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
     environment:
       PORT: ${PORT}
       DATABASE_URL: ${DATABASE_URL}
