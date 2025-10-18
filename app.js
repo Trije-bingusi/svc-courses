@@ -1,15 +1,26 @@
 import express from "express";
 import { Pool } from "pg";
 
-const app = express();
-app.use(express.json());
+function required(name, fallback) {
+    const v = process.env[name] ?? fallback;
+    if (v === undefined || v === null || v === "") {
+        throw new Error(`Missing env: ${name}`);
+    }
+    return v;
+}
 
-const DATABASE_URL =
-    process.env.DATABASE_URL || "postgres://postgres:postgres@localhost:5432/courses";
+const PORT = Number(required("PORT", 3000));
+const DATABASE_URL = required("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/courses");
 
 const pool = new Pool({
-    connectionString: DATABASE_URL
+    connectionString: DATABASE_URL,
+    max: 10,
+    idleTimeoutMillis: 10_000,
+    connectionTimeoutMillis: 5_000,
 });
+
+const app = express();
+app.use(express.json());
 
 // Create tables if they don't already exist
 async function ensureSchema() {
@@ -93,10 +104,16 @@ app.post("/api/courses/:courseId/lectures", async (req, res) => {
     res.status(201).json(rows[0]);
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log("Courses service listening on port", port));
+// error handling
+app.use((err, _req, res, _next) => {
+    console.error(err);
+    res.status(500).json({ error: "Internal server error" });
+});
 
-const server = app.listen(port, () => console.log("Courses up on", port))
+// start + graceful shutdown
+const server = app.listen(PORT, () => {
+  console.log("Courses service listening on port", PORT);
+});
 
 function shutdown() {
     console.log("Shutting down server...");
