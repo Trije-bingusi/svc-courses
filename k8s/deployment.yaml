@@ -57,15 +57,20 @@ spec:
               port: 3000
             initialDelaySeconds: 10
             periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
           readinessProbe:            # can it serve traffic
             httpGet:
               path: /readyz
               port: 3000
-            initialDelaySeconds: 10
+            initialDelaySeconds: 20
             periodSeconds: 5
+            timeoutSeconds: 6
+            failureThreshold: 6
           startupProbe:              # give slow boots more time; once OK, liveness starts
             httpGet:
               path: /healthz
               port: 3000
             failureThreshold: 30
             periodSeconds: 2
+            timeoutSeconds: 2
