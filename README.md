@@ -46,6 +46,7 @@ svc-courses/
 │     ├─ aks-create.sh        # idempotent create & kubeconfig
 │     ├─ aks-start.sh         # start cluster (resumes nodes)
 │     ├─ aks-stop.sh          # stop cluster (saves credits)
+│     ├─ aks-scale.sh         # scale workers up/down (1-2 nodes)
 │     └─ test-aks.sh          # show state/details; nodes if running
 └─ README.md
 ```
@@ -123,11 +124,21 @@ cp scripts/aks/example-aks.env scripts/aks/aks.env
 ./scripts/aks/aks-stop.sh
 ```
 
+5) Scale workers quickly:
+```bash
+# develop cheaply on 1 node
+./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 1
+
+# before demo scale to 2 nodes
+./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 2
+```
+
 ---
 
 ## Saving credits
 - **AKS nodes** (the VM(s)) are the main cost. Use:
   - `./scripts/aks/aks-stop.sh` when you’re done
   - `./scripts/aks/aks-start.sh` when you need it again
+  - `./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 1` during development, then 2 before demos.
 
 ---
