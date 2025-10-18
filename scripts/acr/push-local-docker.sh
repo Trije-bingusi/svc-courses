@@ -4,7 +4,7 @@ set -euo pipefail
 # Resolve paths first
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"          # repo root
-ENV_FILE="${1:-$SCRIPT_DIsR/azure.env}"               # default to scripts/acr/azure.env
+ENV_FILE="${1:-$SCRIPT_DIR/azure.env}"               # default to scripts/acr/azure.env
 source "$ENV_FILE"
 
 # Ensure right subscription
