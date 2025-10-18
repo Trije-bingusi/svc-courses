@@ -15,3 +15,6 @@ scripts/**/azure.env
 scripts/**/aks.env
 scripts/**/.env
 scripts/**/.env.*
+
+# IDEs and editors
+.vscode/
