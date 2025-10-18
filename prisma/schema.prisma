@@ -1,15 +1,25 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Course {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  created_at DateTime @default(now())
+  lectures   Lecture[]
+}
+
+model Lecture {
+  id           String   @id @default(uuid()) @db.Uuid
+  course_id    String   @db.Uuid
+  title        String
+  manifest_url String?  @db.Text
+  created_at   DateTime @default(now())
+  course       Course   @relation(fields: [course_id], references: [id], onDelete: Cascade)
 }
