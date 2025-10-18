@@ -2,7 +2,7 @@
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_FILE="${1:-$SCRIPT_DIR/aks.env}"
-COUNT="${2:-1}"  # default 2
+COUNT="${2:-2}"  # default 2
 source "$ENV_FILE"
 
 [[ -n "${SUBSCRIPTION:-}" ]] && az account set --subscription "$SUBSCRIPTION"
