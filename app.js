@@ -95,3 +95,15 @@ app.post("/api/courses/:courseId/lectures", async (req, res) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log("Courses service listening on port", port));
+
+const server = app.listen(port, () => console.log("Courses up on", port))
+
+function shutdown() {
+    console.log("Shutting down server...");
+    server.close(() => {
+        pool.end().then(() => process.exit(0)); 
+    });
+    setTimeout(() => process.exit(1), 10000).unref();
+}
+process.on("SIGINT", shutdown);
+process.on("SIGTERM", shutdown);
