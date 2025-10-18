@@ -13,6 +13,7 @@ pnpm-debug.log*
 # per-folder envs
 scripts/**/azure.env
 scripts/**/aks.env
+scripts/**/db.env
 scripts/**/.env
 scripts/**/.env.*
 
