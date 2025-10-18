@@ -1,5 +1,7 @@
 import express from "express";
 import { Pool } from "pg";
+import { apiReference } from "@scalar/express-api-reference";
+import YAML from "yamljs";
 
 function required(name, fallback) {
     const v = process.env[name] ?? fallback;
@@ -21,6 +23,20 @@ const pool = new Pool({
 
 const app = express();
 app.use(express.json());
+
+// Scalar API reference setup
+const openapi = YAML.load("./openapi.yaml");
+app.get("/openai.json", (_req, res) => res.json(openapi));
+
+// Serve API reference at /docs
+app.use(
+    "/docs",
+    apiReference({
+        spec: { url: "/openai.json" },
+        theme: "default",
+        darkMode: true
+    })
+);
 
 // Create tables if they don't already exist
 async function ensureSchema() {
