@@ -2,13 +2,19 @@ FROM node:22-alpine@sha256:dbcedd8aeab47fbc0f4dd4bffa55b7c3c729a707875968d467aaa
 
 WORKDIR /usr/src/app
 
+# Copy package manifests and Prisma schema first
 COPY package*.json ./
+COPY prisma ./prisma
 
-# Use npm ci for clean install; fallback to npm install if ci fails
-RUN npm ci --omit=dev || npm install --omit-dev
+# Install all deps (incl. dev) so prisma CLI is available
+RUN npm ci
 
+# Copy the rest
 COPY . .
 
-EXPOSE 3000
+# Trim dev deps for a smaller runtime image
+RUN npm prune --omit=dev
 
+ENV NODE_ENV=production
+EXPOSE 3000
 CMD ["npm", "start"]
