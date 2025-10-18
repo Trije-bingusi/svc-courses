@@ -20,6 +20,8 @@
   "homepage": "https://github.com/Trije-bingusi/svc-courses#readme",
   "dependencies": {
     "express": "^5.1.0",
-    "pg": "^8.16.3"
+    "pg": "^8.16.3",
+    "@scalar/express-api-reference": "^0.8.22",
+    "yamljs": "^0.3.0"
   }
 }
