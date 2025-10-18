@@ -4,7 +4,8 @@ WORKDIR /usr/src/app
 
 COPY package*.json ./
 
-RUN npm ci --omit=dev
+# Use npm ci for clean install; fallback to npm install if ci fails
+RUN npm ci --omit=dev || npm install --omit-dev
 
 COPY . .
 
