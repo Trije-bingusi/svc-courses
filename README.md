@@ -13,7 +13,7 @@ A minimal **Courses** microservice (Express + Postgres) to:
 4. [Local development (Docker Compose)](#local-development-docker-compose)  
 5. [ACR: build & push image](#acr-build--push-image)  
 6. [AKS: create / start / stop / test](#aks-create--start--stop--test)  
-7. [Saving credits](#saving-credits-important)  
+7. [Saving credits](#saving-credits) 
 
 ---
 
