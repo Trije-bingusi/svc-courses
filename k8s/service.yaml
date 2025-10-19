@@ -3,15 +3,11 @@ kind: Service
 metadata:
   name: svc-courses
   namespace: rso
-  labels: 
-    app: svc-courses
-    app.kubernetes.io/name: svc-courses
 spec:
-  type: ClusterIP                   # internal virtual IP for the Pod group
+  type: ClusterIP
   selector:
-    app: svc-courses 
-    tier: backend
+    app: svc-courses
   ports:
     - name: http
-      port: 80                      # service port
-      targetPort: 3000              # containerPort
+      port: 80
+      targetPort: 3000

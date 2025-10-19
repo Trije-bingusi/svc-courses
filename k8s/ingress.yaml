@@ -3,8 +3,6 @@ kind: Ingress
 metadata:
   name: svc-courses
   namespace: rso
-  annotations:
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
 spec:
   ingressClassName: nginx
   rules:
