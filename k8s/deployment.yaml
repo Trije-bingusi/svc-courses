@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: rsobingusi.azurecr.io/svc-courses:dev
+          image: rsobingusi.azurecr.io/svc-courses@sha256:defdc5ac48fcda6124b2623eec03419183592c5b0089533d906eedaa7ff81c17
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
