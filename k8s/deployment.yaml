@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: svc-courses
+  namespace: rso
+  labels:
+    app.kubernetes.io/name: svc-courses
+    app.kubernetes.io/part-of: rso-platform
+    app.kubernetes.io/component: backend
+    app: svc-courses
+  annotations:
+    description: "Courses microservice (Express + Postgres client)"
+spec:
+  replicas: 2                        # independent of AKS node count
+  minReadySeconds: 10                # wait before a pod is considered ready/stable
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1                    # create at most 1 extra pod during rollout
+      maxUnavailable: 1              # allow at most 1 unavailable pod
+  selector:                          # which Pods belong to this Deployment/ReplicaSet
+    matchLabels:
+      app: svc-courses
+      tier: backend
+  template:                          # Pod template
+    metadata:
+      labels:
+        app: svc-courses
+        tier: backend
+        app.kubernetes.io/name: svc-courses
+        app.kubernetes.io/part-of: rso-platform
+    spec:
+      containers:
+        - name: api
+          image: rsobingusi.azurecr.io/svc-courses@sha256:defdc5ac48fcda6124b2623eec03419183592c5b0089533d906eedaa7ff81c17
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          env:
+            - name: PORT
+              value: "3000"
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: db-credentials
+                  key: DATABASE_URL
+          resources:
+            requests:                # scheduler guarantees at least this
+              cpu: 50m
+              memory: 128Mi
+            limits:                  # hard caps
+              cpu: 200m
+              memory: 256Mi
+          livenessProbe:             # is it alive
+            httpGet:
+              path: /healthz
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 3
+          readinessProbe:            # can it serve traffic
+            httpGet:
+              path: /readyz
+              port: 3000
+            initialDelaySeconds: 20
+            periodSeconds: 5
+            timeoutSeconds: 6
+            failureThreshold: 6
+          startupProbe:              # give slow boots more time; once OK, liveness starts
+            httpGet:
+              path: /healthz
+              port: 3000
+            failureThreshold: 30
+            periodSeconds: 2
+            timeoutSeconds: 2

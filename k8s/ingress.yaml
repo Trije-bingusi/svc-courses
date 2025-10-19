@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: svc-courses
+  namespace: rso
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: courses.localtest.me
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: svc-courses
+                port:
+                  number: 80
