@@ -1,144 +1,118 @@
 # svc-courses
 
-A minimal **Courses** microservice (Express + Postgres) to:
-- build & push images to **Azure Container Registry (ACR)**
-- create/start/stop/test an **Azure Kubernetes Service (AKS)** cluster
-
----
-
-## Table of contents
-1. [Tech stack](#tech-stack)  
-2. [Repo structure](#repo-structure)  
-3. [Prerequisites](#prerequisites)  
-4. [Local development (Docker Compose)](#local-development-docker-compose)  
-5. [ACR: build & push image](#acr-build--push-image)  
-6. [AKS: create / start / stop / test](#aks-create--start--stop--test)  
-7. [Saving credits](#saving-credits) 
+Minimal **Courses** microservice (Node/Express + Postgres) for:
+- building & pushing images to **Azure Container Registry (ACR)**
+- creating/running **Azure Kubernetes Service (AKS)**
+- deploying with DB and verifying using cluster‑local tests
 
 ---
 
 ## Tech stack
-- **Node.js / Express** (ESM)
-- **PostgreSQL 16** (Docker)
-- **Docker & Docker Compose**
-- **Azure CLI** (ACR/AKS)
-- **pgAdmin** (UI to inspect the DB)
+Node.js (Express), PostgreSQL 16, Docker/Compose, Azure CLI (ACR/AKS), NGINX Ingress, Prisma.
 
 ---
 
-## Repo structure
+## Repo layout
 ```
-svc-courses/
-├─ app.js                     # Express API (courses + lectures)
-├─ Dockerfile                 # App image
-├─ docker-compose.yml         # Local dev: db + app (+ pgadmin)
-├─ package.json / package-lock.json
-├─ .env.example               # local compose env template
-├─ scripts/
-│  ├─ acr/
-│  │  ├─ example-azure.env    # template for ACR settings
-│  │  ├─ azure.env            # (ignored) real ACR env
-│  │  ├─ push-local-docker.sh # build & push image to ACR
-│  │  └─ test-registry.sh     # verify ACR repo/tags and pulling
-│  └─ aks/
-│     ├─ example-aks.env      # template for AKS settings
-│     ├─ aks.env              # (ignored) real AKS env
-│     ├─ aks-create.sh        # idempotent create & kubeconfig
-│     ├─ aks-start.sh         # start cluster (resumes nodes)
-│     ├─ aks-stop.sh          # stop cluster (saves credits)
-│     ├─ aks-scale.sh         # scale workers up/down (1-2 nodes)
-│     └─ test-aks.sh          # show state/details; nodes if running
-└─ README.md
+k8s/                # namespace, service, deployment, ingress, placeholder secret
+prisma/             # schema + migrations
+scripts/
+  acr/              # ACR env + build & push
+  aks/              # AKS create/start/stop/scale + deploy-with-db-test.sh
+  db/               # Azure Postgres settings + secret helper
+Dockerfile          # app image
+docker-compose.yml  # local dev: app + db (+ pgadmin)
+app.js              # Express API (endpoints)
 ```
 
 ---
 
-## Prerequisites
-- **Docker Desktop** (or Docker Engine)  
-- **Git Bash / WSL / Linux / macOS** (bash to run scripts)  
-- **Azure CLI** (for ACR/AKS):  
-  - Install: <https://learn.microsoft.com/cli/azure/install-azure-cli>  
-  - Login: `az login --use-device-code`
+## Prereqs
+- Docker Desktop/Engine
+- Bash (Git Bash/WSL/macOS/Linux)
+- Azure CLI (`az login --use-device-code`)
 
 ---
 
-## Local development (Docker Compose)
-
-Copy env template and start:
+## Local dev (Compose)
 ```bash
 cp .env.example .env
 docker compose up --build -d
 ```
+
 ---
 
-## ACR: build & push image
-
-1) Prepare env:
+## ACR: build & push
+1) Configure ACR env:
 ```bash
 cp scripts/acr/example-azure.env scripts/acr/azure.env
 ```
-
-2) Log in to Azure:
-```bash
-az login --use-device-code
-```
-
-3) Build and push:
+2) Build & push (uses Buildx; defaults to **linux/arm64** to match AKS nodepool):
 ```bash
 ./scripts/acr/push-local-docker.sh
 ```
-
-4) Verify registry:
-```bash
-./scripts/acr/test-registry.sh
-```
-
-This will:
-- ensure the **Resource Group** & **ACR** exist
-- build `rsobingusi.azurecr.io/svc-courses:dev`
-- push it to your ACR
-- list repos/tags and try a pull
-
+3) Tagging strategy (built into the script):
+- Pushes the chosen tag (e.g. `dev`) **and** a timestamp tag (e.g. `dev-YYYYMMDDHHMMSS`).
+- Prints an immutable **digest**. You can pin the Deployment to that digest:
+  ```yaml
+  image: <loginServer>/svc-courses@sha256:<digest>
+  ```
 ---
 
-## AKS: create / start / stop / test
-
-1) Prepare env:
+## AKS workflow
+1) Configure AKS env:
 ```bash
 cp scripts/aks/example-aks.env scripts/aks/aks.env
 ```
-
-2) Create cluster and fetch kubeconfig:
+2) Create / fetch kubeconfig:
 ```bash
 ./scripts/aks/aks-create.sh
 ```
-
-3) Check status:
+3) Install/ensure NGINX ingress:
 ```bash
-./scripts/aks/test-aks.sh
+./scripts/aks/ingress-install.sh
 ```
 
-4) Start/Stop to control spend:
+
+### Database secret (Azure Postgres + Prisma)
+
+1) Configure DB env:
 ```bash
-./scripts/aks/aks-start.sh
-./scripts/aks/aks-stop.sh
+cp scripts/db/example-db.env scripts/db/db.env
 ```
 
-5) Scale workers quickly:
+2) Create/refresh the Kubernetes Secret (`DATABASE_URL` is built for you):
 ```bash
-# develop cheaply on 1 node
-./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 1
-
-# before demo scale to 2 nodes
-./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 2
+./scripts/db/db-secret.sh
 ```
+
+3) **Apply Prisma migrations** to the DB (optional but recommended on first deploy / when schema changes):
+```bash
+./scripts/db/db-migrate-deploy.sh     # uses DATABASE_URL to run `prisma migrate deploy`
+```
+
+### Deploy + cluster-local tests
+Apply manifests, wait for rollout, then test **inside the cluster** (no reliance on home network):
+```bash
+./scripts/aks/deploy-with-db-test.sh
+```
+It verifies:
+- `GET /healthz` and `GET /api/courses` via the Service DNS
+- the same two calls via the Ingress controller **service**
 
 ---
 
-## Saving credits
-- **AKS nodes** (the VM(s)) are the main cost. Use:
-  - `./scripts/aks/aks-stop.sh` when you’re done
-  - `./scripts/aks/aks-start.sh` when you need it again
-  - `./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 1` during development, then 2 before demos.
+## Cost tips
+```bash
+# Most savings come from scaling AKS to 1 node or stopping AKS and stopping the DB.
+
+./scripts/aks/aks-scale.sh ./scripts/aks/aks.env 1   # cheap dev (scale back to 2 for demos)
+./scripts/aks/aks-stop.sh                            # stop cluster VMs (pause compute)
+./scripts/aks/aks-start.sh                           # start cluster VMs again
+
+./scripts/db/db-stop.sh      # stop DB server (compute paused; storage still billed)
+./scripts/db/db-start.sh     # start DB server
+# Note: a stopped Flexible Server auto-starts after 7 days (Azure policy).
+```
 
 ---
