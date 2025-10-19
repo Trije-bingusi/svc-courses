@@ -1,5 +1,7 @@
 # svc-courses
 
+**NOTE: We don’t accept external contributions; this is a class project. PRs from non-members will be closed.**
+
 Minimal **Courses** microservice (Node/Express + Postgres) for:
 - building & pushing images to **Azure Container Registry (ACR)**
 - creating/running **Azure Kubernetes Service (AKS)**
