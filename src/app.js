@@ -5,17 +5,22 @@ import YAML from "yamljs";
 import { PrismaClient } from "@prisma/client";
 import { apiReference } from "@scalar/express-api-reference";
 
-function required(name, fallback) {
-  const v = process.env[name] ?? fallback;
-  if (v === undefined || v === null || v === "") {
-    throw new Error(`Missing env: ${name}`);
+function env(name, fallback) {
+  const raw = process.env[name];
+  if (raw === undefined || raw === null || raw === "") {
+    if (fallback === undefined) {
+      throw new Error(`Missing env: ${name}`);
+    }
+    return fallback;
   }
-  return v;
+  return raw;
 }
 
-// Prisma reads DATABASE_URL from env
-const PORT = Number(required("PORT", 3000));
-required("DATABASE_URL", "postgres://postgres:postgres@localhost:5432/courses");
+const PORT = Number(env("PORT", "3000"));
+const DATABASE_URL = env(
+  "DATABASE_URL",
+  "postgres://postgres:postgres@localhost:5432/courses"
+);
 
 const prisma = new PrismaClient();
 
