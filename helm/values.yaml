@@ -1,0 +1,61 @@
+namespace: rso
+application:
+  partOf: rso-platform
+  component: backend
+
+replicaCount: 2
+minReadySeconds: 10
+
+containerPort: 3000
+image: "<needs to be set>" # preferably using --set flags during helm install/upgrade
+imagePullPolicy: IfNotPresent
+
+rollingUpdate:
+  enabled: true
+  maxSurge: 1
+  maxUnavailable: 1
+
+resources:
+  limits:
+    cpu: 200m
+    memory: 256Mi
+  requests:
+    cpu: 50m
+    memory: 128Mi
+
+env:
+  - name: PORT
+    value: "3000"
+  - name: DATABASE_URL
+    valueFrom:
+      secretKeyRef:
+        name: db-credentials
+        key: DATABASE_URL
+
+service:
+  type: ClusterIP
+  port: 80
+
+probes:
+  liveness:
+    enabled: true
+    path: /healthz
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    timeoutSeconds: 2
+    failureThreshold: 3
+
+  readiness:
+    enabled: true
+    path: /readyz
+    initialDelaySeconds: 20
+    periodSeconds: 5
+    timeoutSeconds: 6
+    failureThreshold: 6
+
+  startup:
+    enabled: true
+    path: /healthz
+    periodSeconds: 2
+    timeoutSeconds: 2
+    failureThreshold: 30
