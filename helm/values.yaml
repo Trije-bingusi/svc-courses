@@ -35,6 +35,14 @@ service:
   type: ClusterIP
   port: 80
 
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - paths:
+        - path: /api/courses/
+          pathType: Prefix
+
 probes:
   liveness:
     enabled: true
