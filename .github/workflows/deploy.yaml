@@ -18,7 +18,6 @@ env:
 
 jobs:
   deploy-dev:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     name: Deploy to Dev
     runs-on: ubuntu-latest
     environment: dev
