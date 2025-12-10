@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch: # Temporary for manual testing
 
 permissions:
   contents: read
