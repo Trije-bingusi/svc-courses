@@ -3,8 +3,7 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
-  workflow_dispatch: # Temporary for manual testing
+      - dev # TODO: Change to main after done with implementation of CI/CD
 
 permissions:
   contents: read
@@ -12,6 +11,7 @@ permissions:
 
 env:
   IMAGE_NAME: svc-courses
+  IMAGE_PLATFORMS: linux/arm64,linux/amd64
 
 jobs:
 
@@ -65,15 +65,17 @@ jobs:
       with:
         context: .
         push: true
-        platforms: linux/arm64
+        platforms: ${{ env.IMAGE_PLATFORMS }}
         tags: ${{ env.IMAGE_TAGS }}
 
-    - name: Save Image Digest to a File
+    - name: Save Image Tag with Digest to a File
       run: |
-        echo "${{ steps.build.outputs.digest }}" > image-digest.txt
+        DIGEST=${{ steps.build.outputs.digest }}
+        TAG_WITH_DIGEST="${ACR_LOGIN_SERVER}/${IMAGE_NAME}@${DIGEST}"
+        echo "$TAG_WITH_DIGEST" > image-tag.txt
       
     - name: Upload Image Digest Artifact  
       uses: actions/upload-artifact@v4
       with:
-        name: image-digest
-        path: image-digest.txt
+        name: image-tag
+        path: image-tag.txt
