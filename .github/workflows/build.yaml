@@ -12,6 +12,7 @@ permissions:
   id-token: write
 
 env:
+  # TODO: Move to inputs
   IMAGE_NAME: svc-courses
   # IMAGE_PLATFORMS: linux/arm64,linux/amd64
   IMAGE_PLATFORMS: linux/amd64

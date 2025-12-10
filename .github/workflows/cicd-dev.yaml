@@ -1,0 +1,27 @@
+name: CI/CD Pipeline (Dev Cluster)
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  # TODO: Unit tests
+
+  build:
+    name: Build and Push Docker Image
+    uses: ./.github/workflows/build.yaml
+    secrets: inherit
+
+  deploy-dev:
+    name: Deploy to Dev AKS Cluster
+    needs: build
+    uses: ./.github/workflows/deploy-dev.yaml
+    secrets: inherit
+    with:
+      image_tag: ${{ needs.build.outputs.image_tag }}
+
+  # TODO: Smoke tests on dev deployment
