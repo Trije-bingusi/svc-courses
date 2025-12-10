@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - 'v*.*.*'
 
 permissions:
   contents: read
@@ -12,10 +14,12 @@ jobs:
   # TODO: Unit tests
 
   build:
+    if: startsWith(github.ref, 'refs/heads/')
     uses: ./.github/workflows/build.yaml
     secrets: inherit
 
   deploy-dev:
+    if: startsWith(github.ref, 'refs/heads/')
     needs: build
     uses: ./.github/workflows/deploy.yaml
     secrets: inherit
@@ -26,11 +30,11 @@ jobs:
 
   # TODO: Deploy to prod after manual approval (using environment protection rules)
   deploy-prod:
+    if: startsWith(github.ref, 'refs/tags/')
     needs: deploy-dev
     runs-on: ubuntu-latest
     environment: prod
 
     steps:
       - name: Deploy to Prod
-        run: echo "Deploy to production would happen here."
-        
+        run: echo "Deploy to production for tag ${{ github.ref_name }} would happen here."

@@ -53,7 +53,7 @@ jobs:
 
     - name: Define Image Tags
       run: |
-        TIMESTAMP="$(date -u +"%Y%m%d%H%M%S")"
+        TIMESTAMP="$(date -u +"%Y%m%d-%H%M%S")"
         TAG_PREFIX="${ACR_LOGIN_SERVER}/${IMAGE_NAME}"
         
         SHA_TAG="${TAG_PREFIX}:$GITHUB_REF_NAME-$GITHUB_SHA"
