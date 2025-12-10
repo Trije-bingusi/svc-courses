@@ -1,9 +1,12 @@
 name: Deploy to Kubernetes
 
 on:
-  workflow_run:
-    workflows: ["Build and Push Docker Image"]
-    types: [completed]
+  workflow_call:
+    inputs:
+      image_tag:
+        description: 'The image tag to deploy'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -11,6 +14,7 @@ permissions:
 
 env:
   K8S_NAMESPACE: rso
+  IMAGE_TAG: ${{ inputs.image_tag }}
 
 jobs:
   deploy-dev:
@@ -29,16 +33,6 @@ jobs:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-
-    - name: Download Image Tag Artifact
-      uses: actions/download-artifact@v4
-      with:
-        name: image-tag
-
-    - name: Read Image Tag from Artifact
-      run: |
-        IMAGE_TAG=$(cat image-tag.txt)
-        echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
 
     - name: Fetch AKS Config from Key Vault
       run: |

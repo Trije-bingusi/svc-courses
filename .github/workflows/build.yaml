@@ -1,9 +1,11 @@
 name: Build and Push Docker Image
 
 on:
-  push:
-    branches:
-      - main
+  workflow_call:
+    outputs:
+      image_tag:
+        description: 'The immutable Docker image tag with digest'
+        value: ${{ jobs.build-and-push.outputs.image_tag }}
       
 permissions:
   contents: read
@@ -11,7 +13,8 @@ permissions:
 
 env:
   IMAGE_NAME: svc-courses
-  IMAGE_PLATFORMS: linux/arm64,linux/amd64
+  # IMAGE_PLATFORMS: linux/arm64,linux/amd64
+  IMAGE_PLATFORMS: linux/amd64
 
 jobs:
 
@@ -68,14 +71,13 @@ jobs:
         platforms: ${{ env.IMAGE_PLATFORMS }}
         tags: ${{ env.IMAGE_TAGS }}
 
-    - name: Save Image Tag with Digest to a File
+    - name: Output Image Tag with Digest
+      id: tag
       run: |
         DIGEST=${{ steps.build.outputs.digest }}
         TAG_WITH_DIGEST="${ACR_LOGIN_SERVER}/${IMAGE_NAME}@${DIGEST}"
-        echo "$TAG_WITH_DIGEST" > image-tag.txt
-      
-    - name: Upload Image Tag Artifact  
-      uses: actions/upload-artifact@v4
-      with:
-        name: image-tag
-        path: image-tag.txt
+        echo "tag=$TAG_WITH_DIGEST" >> $GITHUB_OUTPUT
+
+    outputs:
+      image_tag: ${{ steps.tag.outputs.tag }}
+  

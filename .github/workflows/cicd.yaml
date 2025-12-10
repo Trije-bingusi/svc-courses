@@ -1,0 +1,21 @@
+name: CI/CD Pipeline
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # TODO: Unit tests
+
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  deploy:
+    needs: build
+    uses: ./.github/workflows/deploy.yaml
+    with:
+      image_tag: ${{ needs.build.outputs.image_tag }}
+
+  # TODO: Smoke tests on dev deployment
+
+  # TODO: Deploy to prod after manual approval (using environment protection rules)
