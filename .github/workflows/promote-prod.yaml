@@ -11,6 +11,7 @@ permissions:
 env:
   IMAGE_NAME: svc-courses
   K8S_NAMESPACE: rso
+# TODO: Handle appVersion as well!
 
 jobs:
 

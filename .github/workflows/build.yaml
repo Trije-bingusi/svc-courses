@@ -57,8 +57,8 @@ jobs:
         TIMESTAMP="$(date -u +"%Y%m%d-%H%M%S")"
         TAG_PREFIX="${ACR_LOGIN_SERVER}/${IMAGE_NAME}"
         
-        SHA_TAG="${TAG_PREFIX}:$GITHUB_REF_NAME-$GITHUB_SHA"
-        TIMESTAMP_TAG="${TAG_PREFIX}:$GITHUB_REF_NAME-${TIMESTAMP}"
+        SHA_TAG="${TAG_PREFIX}:$GITHUB_SHA"
+        TIMESTAMP_TAG="${TAG_PREFIX}:${TIMESTAMP}"
         
         IMAGE_TAGS="${SHA_TAG},${TIMESTAMP_TAG}"
         echo "IMAGE_TAGS=$IMAGE_TAGS" >> $GITHUB_ENV
