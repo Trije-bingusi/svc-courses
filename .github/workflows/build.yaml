@@ -3,8 +3,8 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - dev # TODO: Change to main after done with implementation of CI/CD
-
+      - main
+      
 permissions:
   contents: read
   id-token: write
@@ -74,7 +74,7 @@ jobs:
         TAG_WITH_DIGEST="${ACR_LOGIN_SERVER}/${IMAGE_NAME}@${DIGEST}"
         echo "$TAG_WITH_DIGEST" > image-tag.txt
       
-    - name: Upload Image Digest Artifact  
+    - name: Upload Image Tag Artifact  
       uses: actions/upload-artifact@v4
       with:
         name: image-tag
