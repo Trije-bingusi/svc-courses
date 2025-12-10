@@ -80,4 +80,3 @@ jobs:
 
     outputs:
       image_tag: ${{ steps.tag.outputs.tag }}
-  

@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/build.yaml
     secrets: inherit
 
-  deploy:
+  deploy-dev:
     needs: build
     uses: ./.github/workflows/deploy.yaml
     secrets: inherit
@@ -25,3 +25,12 @@ jobs:
   # TODO: Smoke tests on dev deployment
 
   # TODO: Deploy to prod after manual approval (using environment protection rules)
+  deploy-prod:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: prod
+
+    steps:
+      - name: Deploy to Prod
+        run: echo "Deploy to production would happen here."
+        
