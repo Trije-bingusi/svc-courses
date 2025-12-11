@@ -2,6 +2,16 @@ name: Build and Push Docker Image
 
 on:
   workflow_call:
+    inputs:
+      image_name:
+        description: 'The name of the Docker image'
+        type: string
+        required: true
+      image_platforms:
+        description: 'The target platforms for the Docker image'
+        type: string
+        required: false
+        default: 'linux/amd64,linux/arm64'
     outputs:
       image_tag:
         description: 'The immutable Docker image tag with digest'
@@ -12,17 +22,15 @@ permissions:
   id-token: write
 
 env:
-  # TODO: Move to inputs
-  IMAGE_NAME: svc-courses
-  # IMAGE_PLATFORMS: linux/arm64,linux/amd64
-  IMAGE_PLATFORMS: linux/amd64
+  IMAGE_NAME: ${{ inputs.image_name }}
+  IMAGE_PLATFORMS: ${{ inputs.image_platforms }}
 
 jobs:
 
   build-and-push:
     name: Build and Push Docker Image to ACR
     runs-on: ubuntu-latest
-    environment: dev
+    environment: dev  # Does not matter much, ACR is the same for all envs
 
     steps:
     - name: Checkout
