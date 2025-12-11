@@ -75,10 +75,11 @@ jobs:
     - name: Tag Image with Semantic Version
       run: |
         echo "Tagging digest $DIGEST as '$SEMVER_TAG'"
-        az acr repository tag \
+        az acr import \
           --name "$ACR_LOGIN_SERVER" \
-          --image "$IMAGE_NAME@$DIGEST" \
-          --tag "$SEMVER_TAG"
+          --source "${ACR_LOGIN_SERVER}/${IMAGE_NAME}@$DIGEST" \
+          --image "${IMAGE_NAME}@${SEMVER_TAG}" \
+          --force
 
     - name: Authenticate to AKS
       run: |

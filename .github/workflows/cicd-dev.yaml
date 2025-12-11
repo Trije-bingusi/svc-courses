@@ -1,8 +1,9 @@
 name: CI/CD Pipeline (Dev Cluster)
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch: {} # Temporarily disable automatic triggers
+  # push:
+  #   branches:
+  #     - main
 
 permissions:
   contents: read
