@@ -83,7 +83,7 @@ jobs:
         az acr import \
           --name "$ACR_LOGIN_SERVER" \
           --source "${ACR_LOGIN_SERVER}/${IMAGE_NAME}@$DIGEST" \
-          --image "${IMAGE_NAME}@${SEMVER_TAG}" \
+          --image "${IMAGE_NAME}:${SEMVER_TAG}" \
           --force
 
     - name: Authenticate to AKS
