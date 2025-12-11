@@ -17,7 +17,7 @@ env:
 jobs:
 
   deploy-prod:
-    name: Deploy to Prod AKS Cluster
+    name: Promote to Prod AKS Cluster
     runs-on: ubuntu-latest
     environment: prod
 
