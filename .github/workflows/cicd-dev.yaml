@@ -128,7 +128,7 @@ jobs:
           --namespace $K8S_NAMESPACE \
           --values ./helm/values.yaml \
           --values "$VALUES_FILE" \
-          --set image="$IMAGE_TAG"
+          --set image="${{ needs.build-and-push.outputs.image_tag }}"
 
 
   # TODO: Smoke tests on dev deployment
