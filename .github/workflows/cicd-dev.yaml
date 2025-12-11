@@ -24,8 +24,8 @@ jobs:
     uses: ./.github/workflows/build.yaml
     secrets: inherit
     with:
-      image_name: $IMAGE_NAME
-      image_platforms: $IMAGE_PLATFORMS
+      image_name: ${{ env.IMAGE_NAME }}
+      image_platforms: ${{ env.IMAGE_PLATFORMS }}
 
   deploy-dev:
     name: Deploy to Dev AKS Cluster
@@ -34,9 +34,9 @@ jobs:
     secrets: inherit
     with:
       image_tag: ${{ needs.build.outputs.image_tag }}
-      release_name: $RELEASE_NAME
-      k8s_namespace: $K8S_NAMESPACE
-      values_file: $VALUES_FILE
+      release_name: ${{ env.RELEASE_NAME }}
+      k8s_namespace: ${{ env.K8S_NAMESPACE }}
+      values_file: ${{ env.VALUES_FILE }}
       app_version: ${{ github.sha }}
 
   # TODO: Smoke tests on dev deployment
