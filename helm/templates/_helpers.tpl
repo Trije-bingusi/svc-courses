@@ -20,12 +20,8 @@ Common labels
 {{ include "helm.selectorLabels" . }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-{{- if .Values.application.partOf }}
-app.kubernetes.io/part-of: {{ .Values.application.partOf }}
-{{- end }}
-{{- if .Values.application.component }}
-app.kubernetes.io/component: {{ .Values.application.component }}
-{{- end }}
+app.kubernetes.io/part-of: rso-platform
+app.kubernetes.io/component: backend
 {{- end }}
 
 {{/*

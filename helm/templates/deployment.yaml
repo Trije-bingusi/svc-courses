@@ -13,13 +13,11 @@ spec:
   minReadySeconds: {{ .Values.minReadySeconds }}
 
   # Deployment strategy configuration
-  {{- if .Values.rollingUpdate.enabled }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
-      maxSurge: {{ .Values.rollingUpdate.maxSurge }}
-      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
-  {{- end }}
+      maxSurge: 1
+      maxUnavailable: 1
 
   # Specify how to identify Pods managed by this Deployment
   selector:
@@ -44,7 +42,6 @@ spec:
 
           # Set up the container image
           image: "{{ .Values.image }}"
-          imagePullPolicy: {{ .Values.imagePullPolicy }}
           ports:
             - containerPort: {{ .Values.containerPort }}
           

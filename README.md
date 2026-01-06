@@ -43,7 +43,9 @@ docker compose up --build -d
 
 ## Buld and Deploy to AKS
 
-First, make sure the correct `KEYVAULT_NAME` and `K8S_NAMESPACE` from the [shared-infractructure](https://github.com/Trije-bingusi/shared-infrastructure) repo is set in the [`./scripts/.env`](./scripts/.env) file. Set other variables as needed.
+> **Note:** Deploying to AKS from a local machine is not recommended. Deployments are done through a CI/CD pipeline on merges to the `main` branch. This section is left here for reference only. When developing new features, use local Docker Compose setup described in the [Local Development](#local-development) section.
+
+First, make sure the correct `KEYVAULT_NAME` and `K8S_NAMESPACE` from the [shared-infractructure](https://github.com/Trije-bingusi/shared-infrastructure) repo is set in the [`./scripts/.env`](./scripts/.env) file. Set other variables as needed. You can use the provided [`./scripts/.env.example`](./scripts/.env.example) as a template, which already has the correct values for deployment to the development cluster.
 
 To package the app as a Docker image and push it to ACR, use the [`./scripts/deploy/build.sh`](./scripts/deploy/build.sh) script.
 ```sh
@@ -58,4 +60,4 @@ Upon success, the image will be pushed to ACR and the immutable image tag printe
 
 ## Testing
 
-> **TODO:** Set up a testing framework and add implement tests.
+> **TODO:** Set up a testing framework and implement tests. Use it as part of the CI pipeline.

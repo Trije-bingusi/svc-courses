@@ -7,6 +7,8 @@
 # Usage: ./scripts/deploy/build.sh
 # =====================================================================
 
+set -euo pipefail
+
 # Retrieve configuration from the Key Vault
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/../utils/config.sh"
@@ -27,16 +29,15 @@ echo "Logging into ACR $ACR_LOGIN_SERVER in resource group $RG_NAME"
 az acr login -g "$RG_NAME" -n "$ACR_LOGIN_SERVER"
 
 # Build and push the Docker image
-IMAGE_TAG="${IMAGE_TAG:-${IMAGE_FLOATING_TAG}-$(date +%Y%m%d%H%M%S)}"
+TIMESTAMP=$(date -u +%Y%m%d-%H%M%S)
+IMAGE_TAG="${IMAGE_TAG:-${IMAGE_TAG_PREFIX}-${TIMESTAMP}}"
 echo "Building & pushing:"
 echo "  ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}"
-echo "  ${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_FLOATING_TAG}"
 
 ROOT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 docker buildx build \
   --platform "$IMAGE_PLATFORMS" \
   -t "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_TAG}" \
-  -t "${ACR_LOGIN_SERVER}/${IMAGE_NAME}:${IMAGE_FLOATING_TAG}" \
   --push "$ROOT_DIR"
 
 # Retrieve digest to get immutable image reference
