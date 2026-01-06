@@ -29,11 +29,11 @@ app.use(express.json());
 
 // Scalar API reference
 const openapi = YAML.load("./openapi.yaml");
-app.get("/openapi.json", (_req, res) => res.json(openapi));
+app.get("/docs/courses/openapi.json", (_req, res) => res.json(openapi));
 app.use(
-  "/docs",
+  "/docs/courses",
   apiReference({
-    spec: { url: "/openapi.json" },
+    url: "/docs/courses/openapi.json",
     theme: "default",
     darkMode: true,
   })

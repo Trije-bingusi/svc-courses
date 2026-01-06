@@ -38,7 +38,11 @@ ingress:
   className: nginx
   hosts:
     - paths:
+        # API endpoints
         - path: /api/courses/
+          pathType: Prefix
+        # Documentation endpoint
+        - path: /docs/courses/
           pathType: Prefix
 
 # Health check probes configuration
