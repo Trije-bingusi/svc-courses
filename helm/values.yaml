@@ -32,14 +32,8 @@ service:
   type: ClusterIP
   port: 80
 
-# Ingress configuration for external access
 ingress:
-  enabled: true
-  className: nginx
-  hosts:
-    - paths:
-        - path: /api/courses/
-          pathType: Prefix
+  enabled: false
 
 # Health check probes configuration
 probes:
