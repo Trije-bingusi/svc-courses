@@ -32,22 +32,8 @@ service:
   type: ClusterIP
   port: 80
 
-# Ingress configuration for external access
 ingress:
-  defaultHost: ""  # should be set via --set during helm install/upgrade
-  enabled: true
-  className: nginx
-  hosts:
-    - paths:
-        # API endpoints
-        - path: /api/courses/
-          pathType: Prefix
-        # Documentation endpoint
-        - path: /docs/courses/
-          pathType: Prefix
-  tls:
-    enabled: true
-    secretName: nip-tls
+  enabled: false
 
 # Health check probes configuration
 probes:
