@@ -34,7 +34,7 @@ service:
 
 # Service should not be directly exposed through Ingress, but through API Gateway
 ingress:
-  enabled: true
+  enabled: false
   defaultHost: ""
   className: nginx
   tls:
