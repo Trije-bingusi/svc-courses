@@ -7,8 +7,8 @@ metadata:
     {{- include "helm.labels" . | nindent 4 }}
   annotations:
     kubernetes.io/ingress.class: {{ .Values.ingress.className }}
-    {{- if .Values.ingress.tls.enabled && .Values.ingress.tls.clusterIssuer }}
-    cert-manager.io/cluster-issuer: {{ .Values.ingress.tls.clusterIssuer }}
+    {{- with .Values.ingress.tls.clusterIssuer }}
+    cert-manager.io/cluster-issuer: {{ . | quote }}
     {{- end }}
 
 spec:
