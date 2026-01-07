@@ -34,5 +34,4 @@ helm upgrade --install "$RELEASE_NAME" ./helm \
   --values ./helm/values.yaml \
   --values "$VALUES_FILE" \
   --set image="$IMAGE" \
-  --set ingress.defaultHost="$INGRESS_IP.nip.io" \
   --wait --timeout 5m
