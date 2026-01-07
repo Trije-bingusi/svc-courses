@@ -34,6 +34,7 @@ service:
 
 # Ingress configuration for external access
 ingress:
+  defaultHost: ""  # should be set via --set during helm install/upgrade
   enabled: true
   className: nginx
   hosts:
@@ -44,6 +45,10 @@ ingress:
         # Documentation endpoint
         - path: /docs/courses/
           pathType: Prefix
+  tls:
+    enabled: true
+    secretName: courses-tls
+    clusterIssuer: letsencrypt
 
 # Health check probes configuration
 probes:
