@@ -102,6 +102,60 @@ app.get("/api/courses/:courseId/lectures", async (req, res) => {
   res.json(lectures);
 });
 
+// Get single lecture (without course context)
+app.get("/api/lectures/:lectureId", async (req, res) => {
+  const { lectureId } = req.params;
+  try {
+    const lecture = await prisma.lecture.findUnique({
+      where: { id: lectureId },
+      select: {
+        id: true,
+        course_id: true,
+        title: true,
+        manifest_url: true,
+        created_at: true,
+      },
+    });
+    
+    if (!lecture) {
+      return res.status(404).json({ error: "Lecture not found" });
+    }
+    
+    res.json(lecture);
+  } catch (error) {
+    req.log.error(error, "Failed to fetch lecture");
+    res.status(500).json({ error: "Failed to fetch lecture" });
+  }
+});
+
+// Update single lecture
+app.put("/api/lectures/:lectureId", async (req, res) => {
+  const { lectureId } = req.params;
+  const { title, manifest_url } = req.body || {};
+  
+  try {
+    const lecture = await prisma.lecture.update({
+      where: { id: lectureId },
+      data: {
+        ...(title !== undefined && { title }),
+        ...(manifest_url !== undefined && { manifest_url }),
+      },
+      select: {
+        id: true,
+        course_id: true,
+        title: true,
+        manifest_url: true,
+        created_at: true,
+      },
+    });
+    
+    res.json(lecture);
+  } catch (error) {
+    req.log.error(error, "Failed to update lecture");
+    res.status(500).json({ error: "Failed to update lecture" });
+  }
+});
+
 app.post("/api/courses/:courseId/lectures", async (req, res) => {
   const { courseId } = req.params;
   const { title, manifest_url } = req.body || {};
