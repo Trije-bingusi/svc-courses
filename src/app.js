@@ -1,9 +1,9 @@
 import express from "express";
 import client from "prom-client";
-import pinoHttp from "pino-http";
 import YAML from "yamljs";
 import { PrismaClient } from "@prisma/client";
 import { apiReference } from "@scalar/express-api-reference";
+import { logger, httpLogger } from "./logging.js";
 
 function env(name, fallback) {
   const raw = process.env[name];
@@ -26,6 +26,7 @@ const prisma = new PrismaClient();
 
 const app = express();
 app.use(express.json());
+app.use(httpLogger);
 
 // Scalar API reference
 const openapi = YAML.load("./openapi.yaml");
@@ -38,8 +39,6 @@ app.use(
     darkMode: true,
   })
 );
-
-app.use(pinoHttp());
 
 // Prometheus metrics
 client.collectDefaultMetrics();
@@ -176,17 +175,17 @@ app.post("/api/courses/:courseId/lectures", async (req, res) => {
 
 // Error handling
 app.use((err, _req, res, _next) => {
-  console.error(err);
+  logger.error(err, `Internal server error: ${err.message}`);
   res.status(500).json({ error: "Internal server error" });
 });
 
 // Start + graceful shutdown
 const server = app.listen(PORT, () => {
-  console.log("Courses service listening on port", PORT);
+  logger.info("Courses service listening on port", PORT);
 });
 
 function shutdown() {
-  console.log("Shutting down server...");
+  logger.info("Shutting down server...");
   server.close(async () => {
     try {
       await prisma.$disconnect();
